@@ -1,0 +1,135 @@
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len ints to dst.
+# Return the number of positive ints (>0) contained in src.
+# 
+# Include your name and ID here.
+# 515030910312 唐仲乐
+# Describe how and why you modified the baseline code.
+# Use loop unrolling, each loop now deals with 8 value
+##################################################################
+# Do not modify this portion
+# Function prologue.
+ncopy:	pushl %ebp		# Save old frame pointer
+	rrmovl %esp,%ebp	# Set up new frame pointer
+	pushl %esi		# Save callee-save regs
+	pushl %ebx
+	pushl %edi
+	mrmovl 8(%ebp),%ebx	# src
+	mrmovl 16(%ebp),%edx	# len
+	mrmovl 12(%ebp),%ecx	# dst
+
+##################################################################
+# You can modify this portion
+	# Loop header
+	xorl %eax,%eax		# count = 0;
+	iaddl $-8,%edx		# len -= 8
+	jl Remain		# if len < 0, goto Remain:
+Loop:	mrmovl (%ebx), %esi	# read val from src
+	rmmovl %esi, (%ecx)	# store src[0] to dst
+	andl %esi, %esi		# val <= 0?
+	jle Npos1		# if so, goto Npos1:
+	iaddl $1, %eax		# count++
+Npos1:	mrmovl 4(%ebx),%esi	# read val from src+1
+	rmmovl %esi,4(%ecx)	# store src[1] to dst+1
+	andl %esi,%esi		# val <= 0?
+	jle Npos2		# if so, goto Npos2:
+	iaddl $1, %eax		# count++
+Npos2:	mrmovl 8(%ebx), %esi	# read val from src+2
+	rmmovl %esi, 8(%ecx)	# store src[2] to dst+2
+	andl %esi, %esi		# val <= 0?
+	jle Npos3		# if so, goto Npos3:
+	iaddl $1, %eax		# count++
+Npos3:	mrmovl 12(%ebx),%esi	# read val from src+3
+	rmmovl %esi,12(%ecx)	# store src[3] to dst+3
+	andl %esi,%esi		# val <= 0?
+	jle Npos4		# if so, goto Npos4:
+	iaddl $1, %eax		# count++
+Npos4:	mrmovl 16(%ebx), %esi	# read val from src+4
+	rmmovl %esi, 16(%ecx)	# store src[4] to dst+4
+	andl %esi, %esi		# val <= 0?
+	jle Npos5		# if so, goto Npos5:
+	iaddl $1, %eax		# count++
+Npos5:	mrmovl 20(%ebx),%esi	# read val from src+5
+	rmmovl %esi,20(%ecx)	# store src[5] to dst+5
+	andl %esi,%esi		# val <= 0?
+	jle Npos6		# if so, goto Npos6:
+	iaddl $1, %eax		# count++
+Npos6:	mrmovl 24(%ebx), %esi	# read val from sr+6
+	rmmovl %esi, 24(%ecx)	# store src[6] to dst+6
+	andl %esi, %esi		# val <= 0?
+	jle Npos7		# if so, goto Npos7:
+	iaddl $1, %eax		# count++
+Npos7:	mrmovl 28(%ebx),%esi	# read val from src+7
+	rmmovl %esi,28(%ecx)	# store src[7] to dst+7
+	andl %esi,%esi		# val <= 0?
+	jle Next		# if so, goto Next:
+	iaddl $1, %eax		# count++
+Next:	iaddl $32, %ebx		# src+=32
+	iaddl $32, %ecx		# dst+=32
+	iaddl $-8, %edx		# len-=8
+	jge Loop		# if len > 0, goto Loop:
+Remain:	iaddl $7, %edx		# restore len of remain and len--
+	jl Done			# if len < 0, goto Done
+	mrmovl (%ebx), %esi	# read val from src
+	rmmovl %esi, (%ecx)	# store src[0] to dst
+	andl %esi, %esi		# val <= 0?
+	jle Rest1		# if so, goto Rest1:
+ 	iaddl $1, %eax		# count++
+Rest1:	iaddl $-1, %edx		# len--
+	jl Done			# if len < 0, goto Done
+	mrmovl 4(%ebx),%esi	# read val from src+1
+	rmmovl %esi,4(%ecx)	# store src[1] to dst+1
+	andl %esi,%esi		# val <= 0?
+	jle Rest2		# if so, goto Rest2:
+ 	iaddl $1, %eax		# count++
+Rest2:	iaddl $-1, %edx		# len--
+	jl Done			# if len < 0, goto Done
+	mrmovl 8(%ebx), %esi	# read val from src+2
+	rmmovl %esi, 8(%ecx)	# store src[2] to dst+2
+	andl %esi, %esi		# val <= 0?
+	jle Rest3		# if so, goto Rest3:
+ 	iaddl $1, %eax		# count++
+Rest3:	iaddl $-1, %edx		# len--
+	jl Done			# if len < 0, goto Done
+	mrmovl 12(%ebx),%esi	# read val from src+3
+	rmmovl %esi,12(%ecx)	# store src[3] to dst+3
+	andl %esi,%esi		# val <= 0?
+	jle Rest4		# if so, goto Rest4:
+ 	iaddl $1, %eax		# count++
+Rest4:	iaddl $-1, %edx		# len--
+	jl Done			# if len < 0, goto Done
+	mrmovl 16(%ebx), %esi	# read val from src+4
+	rmmovl %esi, 16(%ecx)	# store src[4] to dst
+	andl %esi, %esi		# val <= 0?
+	jle Rest5		# if so, goto Rest5:
+ 	iaddl $1, %eax		# count++
+Rest5:	iaddl $-1, %edx		# len--
+	jl Done			# if len < 0, goto Done
+	mrmovl 20(%ebx),%esi	# read val from src+5
+	rmmovl %esi,20(%ecx)	# store src[5] to dst+5
+	andl %esi,%esi		# val <= 0?
+	jle Rest6		# if so, goto Rest6:
+ 	iaddl $1, %eax		# count++
+Rest6:	iaddl $-1, %edx		# len--
+	jl Done			# if len < 0, goto Done
+	mrmovl 24(%ebx), %esi	# read val from src+6
+	rmmovl %esi, 24(%ecx)	# store src[6] to dst+6
+	andl %esi, %esi		# val <= 0?
+	jle Done		# if so, goto Rest1:
+ 	iaddl $1, %eax		# count++
+
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+	popl %edi               # Restore callee-save registers
+	popl %ebx
+	popl %esi
+	rrmovl %ebp, %esp
+	popl %ebp
+	ret
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end ncopy-ys */

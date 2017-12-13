@@ -1,0 +1,54 @@
+# 515030910312 唐仲乐
+# Modification of copy_block code to copy a block of words from one part of memory to another area of memory.
+# Computing the checksum of all the words copied.
+# Execution begins at address 0
+	.pos 0
+init:	irmovl	Stack, %esp  	# Set up Stack pointer
+	rrmovl	%esp, %ebp  	# Set up base pointer
+	irmovl	$3,%edx
+	pushl	%edx
+	irmovl	dest,%ecx
+	pushl	%ecx
+	irmovl	src,%ebx
+	pushl	%ebx
+	call	Copyblock	# Execute copy_block
+	halt			#halt
+
+.align	4
+#Source block
+src:
+	.long 0x00a
+	.long 0x0b0
+	.long 0xc00
+
+#Destination block
+dest:
+	.long 0x111
+	.long 0x222
+	.long 0x333
+
+#int copy_block(int *src, int *dest, int len)
+Copyblock:
+	pushl	%ebp
+	rrmovl	%esp,%ebp
+	xorl	%eax,%eax	#int result = 0
+	mrmovl	16(%ebp),%edx
+	mrmovl	12(%ebp),%ecx	
+	mrmovl	8(%ebp),%ebx	
+	andl	%edx,%edx	#while(len>0)
+	je	End
+Loop:	irmovl	$1,%edi		#len--;
+	subl	%edi,%edx
+	mrmovl	(%ebx),%esi	#int val = *src++;
+	irmovl	$4,%edi
+	addl	%edi,%ebx
+	rmmovl	%esi,(%ecx)	#*dest++ = val
+	addl	%edi,%ecx
+	xorl	%esi,%eax	#return ^= val;
+	andl	%edx,%edx
+	jne	Loop
+End:	popl	%ebp
+	ret
+
+	.pos 0x100
+Stack:	# The stack goes here	

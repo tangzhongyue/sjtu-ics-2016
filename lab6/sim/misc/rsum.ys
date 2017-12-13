@@ -1,0 +1,44 @@
+# 515030910312 唐仲乐
+# Modification of rsum_list code to sum the elements of a linked list.(use the recursive version)
+# Execution begins at address 0
+	.pos 0
+init:	irmovl	Stack, %esp  	# Set up Stack pointer
+	rrmovl	%esp, %ebp  	# Set up base pointer
+	irmovl	ele1,%eax
+	pushl	%eax
+	call	Rsumlist	# Execute sum_list
+	halt			#halt
+
+# Sample linked list
+	.align 4
+ele1:
+	.long 0x00a
+	.long ele2
+ele2:
+	.long 0x0b0
+	.long ele3
+ele3:
+	.long 0xc00
+	.long 0
+
+	#int rsum_list(list_ptr ls)
+Rsumlist:
+	pushl	%ebp
+	rrmovl	%esp,%ebp
+	pushl	%edi			
+	mrmovl	8(%ebp),%ecx
+	xorl	%eax,%eax
+	andl	%ecx,%ecx	#if(!ls)return 0;
+	je	End
+	mrmovl	(%ecx),%edi	#int val = ls->val;
+	mrmovl	4(%ecx),%edx	#int rest = rsum_list(ls->next);
+	pushl	%edx
+	call	Rsumlist
+	addl	%edi,%eax
+	popl	%edx
+End:	popl	%edi
+	popl	%ebp
+	ret
+
+	.pos 0x100
+Stack:	# The stack goes here

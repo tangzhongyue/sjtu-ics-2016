@@ -1,0 +1,54 @@
+                      | # 515030910312 唐仲乐
+                      | # Modification of copy_block code to copy a block of words from one part of memory to another area of memory.
+                      | # Computing the checksum of all the words copied.
+                      | # Execution begins at address 0
+  0x000:              | 	.pos 0
+  0x000: 30f400010000 | init:	irmovl	Stack, %esp  	# Set up Stack pointer
+  0x006: 2045         | 	rrmovl	%esp, %ebp  	# Set up base pointer
+  0x008: 30f203000000 | 	irmovl	$3,%edx
+  0x00e: a02f         | 	pushl	%edx
+  0x010: 30f134000000 | 	irmovl	dest,%ecx
+  0x016: a01f         | 	pushl	%ecx
+  0x018: 30f328000000 | 	irmovl	src,%ebx
+  0x01e: a03f         | 	pushl	%ebx
+  0x020: 8040000000   | 	call	Copyblock	# Execute copy_block
+  0x025: 00           | 	halt			#halt
+                      | 
+  0x028:              | .align	4
+                      | #Source block
+  0x028:              | src:
+  0x028: 0a000000     | 	.long 0x00a
+  0x02c: b0000000     | 	.long 0x0b0
+  0x030: 000c0000     | 	.long 0xc00
+                      | 
+                      | #Destination block
+  0x034:              | dest:
+  0x034: 11010000     | 	.long 0x111
+  0x038: 22020000     | 	.long 0x222
+  0x03c: 33030000     | 	.long 0x333
+                      | 
+                      | #int copy_block(int *src, int *dest, int len)
+  0x040:              | Copyblock:
+  0x040: a05f         | 	pushl	%ebp
+  0x042: 2045         | 	rrmovl	%esp,%ebp
+  0x044: 6300         | 	xorl	%eax,%eax	#int result = 0
+  0x046: 502510000000 | 	mrmovl	16(%ebp),%edx
+  0x04c: 50150c000000 | 	mrmovl	12(%ebp),%ecx	
+  0x052: 503508000000 | 	mrmovl	8(%ebp),%ebx	
+  0x058: 6222         | 	andl	%edx,%edx	#while(len>0)
+  0x05a: 7386000000   | 	je	End
+  0x05f: 30f701000000 | Loop:	irmovl	$1,%edi		#len--;
+  0x065: 6172         | 	subl	%edi,%edx
+  0x067: 506300000000 | 	mrmovl	(%ebx),%esi	#int val = *src++;
+  0x06d: 30f704000000 | 	irmovl	$4,%edi
+  0x073: 6073         | 	addl	%edi,%ebx
+  0x075: 406100000000 | 	rmmovl	%esi,(%ecx)	#*dest++ = val
+  0x07b: 6071         | 	addl	%edi,%ecx
+  0x07d: 6360         | 	xorl	%esi,%eax	#return ^= val;
+  0x07f: 6222         | 	andl	%edx,%edx
+  0x081: 745f000000   | 	jne	Loop
+  0x086: b05f         | End:	popl	%ebp
+  0x088: 90           | 	ret
+                      | 
+  0x100:              | 	.pos 0x100
+  0x100:              | Stack:	# The stack goes here	

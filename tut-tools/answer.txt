@@ -1,0 +1,5 @@
+1.ps
+2.grep ^a  /usr/share/dict/words|wc -w
+3.ls -S|grep .conf|head -5
+4.sudo chmod 755 echo.sh
+  ./echo.sh

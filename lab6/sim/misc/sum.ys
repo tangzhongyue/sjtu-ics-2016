@@ -1,0 +1,43 @@
+# 515030910312 唐仲乐
+# Modification of sum_list code to sum the elements of a linked list.
+# Execution begins at address 0
+	.pos 0
+init:	irmovl	Stack, %esp  	# Set up Stack pointer
+	rrmovl	%esp, %ebp  	# Set up base pointer
+	irmovl	ele1,%eax
+	pushl	%eax
+	call	Sumlist		# Execute sum_list
+	halt			#halt
+
+# Sample linked list
+	.align 4
+ele1:
+	.long 0x00a
+	.long ele2
+ele2:
+	.long 0x0b0
+	.long ele3
+ele3:
+	.long 0xc00
+	.long 0
+
+	#int sumlist(list_ptr ls)
+Sumlist:
+	pushl	%ebp
+	rrmovl	%esp,%ebp
+	irmovl	$0,%eax			#int val = 0;
+	mrmovl	8(%ebp),%edx
+	andl	%edx,%edx
+	je	End
+Loop:	mrmovl	(%edx),%ecx			
+	addl	%ecx,%eax		#val += ls->val;
+	mrmovl	4(%edx),%edi
+	rrmovl	%edi,%edx		#ls = ls->next;
+	andl	%edx,%edx		#while(ls)
+	jne	Loop
+End:	rrmovl	%ebp,%esp
+	popl	%ebp
+	ret
+
+	.pos 0x100
+Stack:	# The stack goes here
